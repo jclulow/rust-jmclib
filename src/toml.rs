@@ -1,4 +1,4 @@
-use std::io::{Write, Read, BufReader, BufWriter};
+use std::io::{Write, Read, BufReader, BufWriter, ErrorKind};
 use std::fs::File;
 use std::path::Path;
 
@@ -9,19 +9,26 @@ use tempfile::NamedTempFile;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 /**
- * Read a TOML-formatted file into an object via serde deserialisation.
+ * Read a TOML-formatted file into an optional object via serde deserialisation.
+ * If the requested file does not exist, None will be returned.
  */
-pub fn read_file<T, P: AsRef<Path>>(p: P) -> Result<T>
+pub fn read_file<T, P: AsRef<Path>>(p: P) -> Result<Option<T>>
 where
     for<'de> T: Deserialize<'de>
 {
-    let f = File::open(p)?;
+    let f = match File::open(p) {
+        Err(e) => match e.kind() {
+            ErrorKind::NotFound => return Ok(None),
+            _ => return Err(e.into()),
+        }
+        Ok(f) => f,
+    };
     let mut r = BufReader::new(f);
     let mut buf = Vec::<u8>::new();
 
     r.read_to_end(&mut buf)?;
 
-    Ok(toml::from_slice(&buf)?)
+    Ok(Some(toml::from_slice(&buf)?))
 }
 
 /**
