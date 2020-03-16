@@ -41,7 +41,6 @@ where
      */
     let dir = p.parent().expect("no parent directory?!");
     let tf = NamedTempFile::new_in(dir)?;
-    println!("tempfile: {}", tf.path().display());
 
     {
         let mut w = BufWriter::new(tf.as_file());
