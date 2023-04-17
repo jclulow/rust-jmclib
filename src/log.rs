@@ -2,7 +2,7 @@ use atty::Stream;
 use slog::Drain;
 use std::sync::Mutex;
 
-use slog::{o, Logger};
+use slog::{o, Discard, Logger};
 use slog_term::{CompactFormat, FullFormat, TermDecorator};
 
 pub mod prelude {
@@ -23,4 +23,11 @@ pub fn init_log() -> Logger {
             .fuse();
         Logger::root(dr, o!())
     }
+}
+
+/**
+ * Return a logger which discards all log output.
+ */
+pub fn discard() -> Logger {
+    Logger::root(Discard, o!())
 }
