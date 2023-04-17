@@ -1,9 +1,9 @@
-use std::io::{Write, Read, BufReader, BufWriter, ErrorKind};
-use std::fs::File;
-use std::path::{Path, PathBuf};
 use std::error::Error;
+use std::fs::File;
+use std::io::{BufReader, BufWriter, ErrorKind, Read, Write};
+use std::path::{Path, PathBuf};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use tempfile::NamedTempFile;
 
@@ -21,11 +21,11 @@ impl std::fmt::Display for TomlError {
     }
 }
 
-impl Error for TomlError {
-}
+impl Error for TomlError {}
 
 impl<T, E> Context<T, E> for std::result::Result<T, E>
-    where E: Error
+where
+    E: Error,
 {
     fn context(self, path: &Path) -> Result<T> {
         self.map_err(|e| TomlError {
@@ -40,10 +40,7 @@ pub trait Context<T, E> {
 }
 
 fn e(msg: &str, path: &Path) -> TomlError {
-    TomlError {
-        path: path.to_path_buf(),
-        msg: msg.to_string(),
-    }
+    TomlError { path: path.to_path_buf(), msg: msg.to_string() }
 }
 
 /**
@@ -52,7 +49,7 @@ fn e(msg: &str, path: &Path) -> TomlError {
  */
 pub fn read_file<T, P: AsRef<Path>>(p: P) -> Result<Option<T>>
 where
-    for<'de> T: Deserialize<'de>
+    for<'de> T: Deserialize<'de>,
 {
     let p = p.as_ref();
 
@@ -60,7 +57,7 @@ where
         Err(e) => match e.kind() {
             ErrorKind::NotFound => return Ok(None),
             _ => return Err(e).context(p),
-        }
+        },
         Ok(f) => f,
     };
     let mut r = BufReader::new(f);
@@ -76,7 +73,7 @@ where
  */
 pub fn write_file<T, P: AsRef<Path>>(p: P, o: &T) -> Result<()>
 where
-    T: Serialize
+    T: Serialize,
 {
     let p = p.as_ref();
     let o = toml::to_vec(o).context(p)?;

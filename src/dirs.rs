@@ -1,7 +1,7 @@
-use std::path::{Path, PathBuf};
-use std::path::Component;
 use std::ffi::OsStr;
 use std::io::Result;
+use std::path::Component;
+use std::path::{Path, PathBuf};
 
 fn discard_n(pb: &mut PathBuf, n: u32) {
     for _ in 0..n {
@@ -38,8 +38,9 @@ pub fn rootdir() -> Result<PathBuf> {
     let last: Vec<Component> = exe.components().rev().skip(1).collect();
 
     if last.len() >= 2 {
-        if (last[0] == pc("debug") || last[0] == pc("release")) &&
-            last[1] == pc("target") {
+        if (last[0] == pc("debug") || last[0] == pc("release"))
+            && last[1] == pc("target")
+        {
             /*
              * Cargo target directory.
              */
@@ -58,8 +59,10 @@ pub fn rootdir() -> Result<PathBuf> {
         }
     }
 
-    ioe(format!("could not determine data directory relative to executive \
-        path \"{}\"", exe.display()))
+    ioe(format!(
+        "could not determine data directory relative to executive path \"{}\"",
+        exe.display(),
+    ))
 }
 
 /**
