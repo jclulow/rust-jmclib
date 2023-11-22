@@ -43,7 +43,7 @@ impl SqliteSetup {
         self
     }
 
-    pub fn cache_kb<S: ToString>(&mut self, kb: u32) -> &mut Self {
+    pub fn cache_kb(&mut self, kb: u32) -> &mut Self {
         self.cache_kb = Some(kb);
         self
     }
