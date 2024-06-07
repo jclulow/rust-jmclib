@@ -61,11 +61,11 @@ where
         Ok(f) => f,
     };
     let mut r = BufReader::new(f);
-    let mut buf = Vec::<u8>::new();
+    let mut s = String::new();
 
-    r.read_to_end(&mut buf).context(p)?;
+    r.read_to_string(&mut s).context(p)?;
 
-    Ok(Some(toml::from_slice(&buf).context(p)?))
+    Ok(Some(toml::from_str(&s).context(p)?))
 }
 
 /**
@@ -76,7 +76,7 @@ where
     T: Serialize,
 {
     let p = p.as_ref();
-    let o = toml::to_vec(o).context(p)?;
+    let o = toml::to_string(o).context(p)?;
 
     /*
      * In order to safely and atomically update the file with the new contents,
@@ -88,7 +88,7 @@ where
 
     {
         let mut w = BufWriter::new(tf.as_file());
-        w.write_all(&o).context(p)?;
+        w.write_all(o.as_bytes()).context(p)?;
         w.flush().context(p)?;
     }
 
